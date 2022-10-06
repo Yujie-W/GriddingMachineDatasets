@@ -1,0 +1,8 @@
+[deps]
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
+NetcdfIO = "6a36f34d-89cf-423a-87c4-84549e82f670"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+
+[compat]
+ArchGDAL = "0.9.2"
+NetcdfIO = "0.2.5"
