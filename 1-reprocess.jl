@@ -64,7 +64,7 @@ function prepare_data!(artifact_name::String, datafiles::Union{String, Vector{St
     # do nothing if file exists
     _reprocessed_file = "$(GRIDDING_MACHINE_HOME)/reprocessed/$(artifact_name).nc";
     if isfile(_reprocessed_file)
-        @info "Reprocessed file exists already, nothing has been done!";
+        @warn "Reprocessed file exists already, nothing has been done!";
         return nothing
     end
 
@@ -96,7 +96,7 @@ function prepare_data!(artifact_name::String, datafiles::Union{String, Vector{St
     # ask user if the preview is okay to proceed
     @info "If the preview looks good, please type [yes] or [YES] to proceed:";
     if lowercase(readline()) != "yes"
-        @info "The results are not satisfactory, and thus not saved. Please check your settings and rerun the function!"
+        @warn "The results are not satisfactory, and thus not saved. Please check your settings and rerun the function!"
         return nothing
     end;
 
