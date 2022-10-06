@@ -1,6 +1,8 @@
 using ArchGDAL
-using NetcdfIO: append_nc!, save_nc!
 using Plots
+
+using GriddingMachine.Blender: regrid
+using NetcdfIO: append_nc!, save_nc!
 
 
 ENV["GKSwstype"] = "100";
@@ -60,7 +62,7 @@ read_data(datafiles::Vector{String}, labels::Union{Vector{Int}, Vector{String}};
 
 
 function prepare_data!(artifact_name::String, datafiles::Union{String, Vector{String}}, labels::Union{Int, String, Vector}, var_attributes::Dict{String,String};
-                       stdfiles::Union{Nothing, String, Vector{String}} = nothing, stdlabels::Union{Nothing, Int, String, Vector} = nothing, args...)
+                       stdfiles::Union{Nothing, String, Vector{String}} = nothing, stdlabels::Union{Nothing, Int, String, Vector} = nothing, division::Union{Nothing,Int} = nothing, args...)
     # do nothing if file exists
     _reprocessed_file = "$(GRIDDING_MACHINE_HOME)/reprocessed/$(artifact_name).nc";
     if isfile(_reprocessed_file)
@@ -71,6 +73,12 @@ function prepare_data!(artifact_name::String, datafiles::Union{String, Vector{St
     # read and combine the data and std
     _data = read_data(datafiles, labels; args...);
     _stdv = isnothing(stdfiles) ? similar(_data) .* NaN : read_data(stdfiles, stdlabels; args...);
+
+    # regrid the data if division is not nothing
+    if !isnothing(division)
+        _data = regrid(_data, division);
+        _stdv = regrid(_stdv, division);
+    end;
 
     # preview the data and std
     _zoom = Int(size(_data,1) / 360);
