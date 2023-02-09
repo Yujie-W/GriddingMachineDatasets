@@ -86,7 +86,7 @@ function json!()
     print("    Please input the author information (e.g., Name S. et al.) > ");
     _authors = readline();
     print("    Please input the year of the publication > ");
-    _year_pub = readline();
+    _year_pub = parse(Int,readline());
     print("    Please input the title of the publication > ");
     _title = readline();
     print("    Please input the journal of the publication > ");
@@ -102,12 +102,76 @@ function json!()
     @info "These inputs are meant to determine what changes are required to pre-process the dataset...";
 
     # ask the format of input dataset
+    print("    What is the format of the input dataset? (NetCDF or GeoTIFF) > ");
+    _format = uppercase(readline());
+    @assert _format in ["G", "GEOTIFF", "N", "NETCDF", "TIFF"] "The dataset must be NetCDF or GeoTIFF!";
 
-    #=
-                "change1"  => "The original files used GeoTIFF, and we converted it to NetCDF",
-                "change2"  => "The original lat was from north to south, and we reorgainized it from south to north",
-                "change3"  => "There was no uncertainty included, and we added an empty matrix filled with NaN");
-    =#
+    # ask the projection of the map
+    print("    What is the projection of the dataset? (Cylindrical or Sinusoidal) > ");
+    _projection = uppercase(readline());
+    @assert _projection in ["C", "CYLINDRICAL", "S", "SINUSOIDAL"] "The dataset projection must be within Cylindrical and Sinusoidal!";
+
+    # ask for value of representation
+    print("    What does the value represent? (Center or Edge) > ");
+    _represent = uppercase(readline());
+    @assert _represent in ["C", "CENTER", "E", "EDGE"] "You must choose one from Center or Edge!";
+
+    # ask and parse map coverage
+    print("    What is the coverage of the dataset? (Global or not; if not global, type in the conner values in the order or min lat, max lat, min lon, max lon) > ");
+    _coverage = uppercase(readline());
+    if occursin(",", _coverage)
+        _conners = [parse(Float64, _str) for _str in split(_coverage, ",")];
+        @assert -90 <= _conners[1] < _conners[2] <= 90 "Latitude must be within -90 to 90";
+        @assert ((-180 <= _conners[3] < _conners[4] <= 180) || 0 <= _conners[3] < _conners[4] <= 360) "Longitude must be within -180 to 180 or 0 to 360";
+    else
+        @assert _coverage in ["G", "GLOBAL"] "You need to guarantee the coverage input is correct";
+    end;
+    _coverages = (_coverage in ["G", "GLOBAL"] ? "Global" : [parse(Float64, _str) for _str in split(_coverage, ",")]);
+
+    # ask for re-oritentation of the map
+    print("    Do you need to re-orient the map on the latitudinal direction? (Yes or No) > ");
+    _reorient_lat = uppercase(readline());
+    @assert _reorient_lat in ["N", "NO", "Y", "YES"];
+    print("    Do you need to re-orient the map on the longitudinal direction? (Yes or No) > ");
+    _reorient_lon = uppercase(readline());
+    @assert _reorient_lon in ["N", "NO", "Y", "YES"];
+
+    #
+    #
+    # About the variables
+    #
+    #
+    @info "These questions are about how to read the data, please be careful about them...";
+
+    # ask for how many independent variables do you want to save as DATA
+    print("    How many variables do you want to save as DATA (e.g., combine data1 and data2 in one netcdf file) > ");
+    _data_count = parse(Int, readline());
+    _data_dicts = Dict{String,Any}[];
+    for _i_data in 1:_data_count
+        println("    For data label $(_i_data):");
+        print("        What is the label name or band name? > ");
+        _data_name = readline();
+        print("        What is the longitude axis number of the data? (e.g., 1 for [lon,lat,time] and 2 for [lat,lon,time]) > ");
+        _i_lon = parse(Int, readline());
+        print("        What is the latitude axis number of the data? (e.g., 2 for [lon,lat,time] and 1 for [lat,lon,time]) > ");
+        _i_lat = parse(Int, readline());
+        print("        What is the index axis number of the data? (e.g., 3 for time in [lon,lat,time] and empty for [lat,lon]) > ");
+        _i_ind = readline();
+        _i_idx = (_i_ind == "" ? nothing : parse(Int, _i_ind));
+        print("        If you have extra scaling you want to make, type it here (NCDatasets may do that already, need to double check, example: x -> log(x)) > ");
+        _scaling_function = readline();
+        print("        What are your mask function for NaN, type it here, e.g., x -> (0.1 < x <= 0.2 && x * 6 > 1) > ");
+        _masking_function = readline();
+        _data_dict = Dict{String,Any}(
+            "DATA NAME"            => _data_name,
+            "LONGITUDE AXIS INDEX" => _i_lon,
+            "LATITUDE AXIS INDEX"  => _i_lat,
+            "INDX AXIS INDX"       => _i_idx,
+            "SCALING FUNCTION"     => _scaling_function,
+            "MASKING FUNCTION"     => _masking_function,
+        );
+        push!(_data_dicts, _data_dict);
+    end;
 
     # display the dict to save
     _json_dict = Dict{String,Any}(
@@ -117,7 +181,8 @@ function json!()
                     "SPATIAL RESOLUTION"  => _spatial_resolution_nx,
                     "TEMPORAL RESOLUTION" => _temporal_resolution,
                     "YEARS"               => _years,
-                    "VERSION"             => _version,),
+                    "VERSION"             => _version,
+        ),
         "Netcdf Attributes" => Dict{String,String}(
                     "LONG NAME" => _longname,
                     "UNIT"      => _unit,
@@ -127,9 +192,17 @@ function json!()
                     "TITLE"     => _title,
                     "JOURNAL"   => _journal,
                     "DOI"       => _doi,
-        )
+        ),
+        "Netcdf Dataset" => Dict{String,Any}(
+                    "FORMAT"        => _format,
+                    "PROJECTION"    => _projection,
+                    "VALUE AT"      => _represent,
+                    "COVERAGE"      => _coverages,
+                    "NEED FLIPPING" => [_reorient_lat, _reorient_lon],
+                    "DATA DETAILS"  => _data_dicts,
+        ),
     );
     @info "You inputs are" _json_dict;
 
-    return nothing
+    return _json_dict
 end
