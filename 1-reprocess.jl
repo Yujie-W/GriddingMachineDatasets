@@ -1,3 +1,4 @@
+#=
 using ArchGDAL
 using Plots
 
@@ -115,3 +116,4 @@ function prepare_data!(artifact_name::String, datafiles::Union{String, Vector{St
 
     return nothing
 end
+=#

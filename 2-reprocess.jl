@@ -102,7 +102,7 @@ function reprocess_data!(
         end;
     end;
 
-    # work on the first data to test
+    # iterate through the files
     _i_years = (_years == "" ? [1] : eachindex(_years));
     for _i_year in _i_years
         # determine whether to skip based on the tag
@@ -152,12 +152,3 @@ function reprocess_data!(
 
     return nothing
 end
-
-
-using Dates
-
-local_json_dict = JSON.parse(open("json/VCF_2X_1Y_V1.json"));
-local_name_function = eval(Meta.parse(local_json_dict["INPUT_DATASET_SETTINGS"]["FILE_NAME_FUNCTION"]));
-local_data_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing : eval(Meta.parse(_dict["SCALING_FUNCTION"])) for _dict in local_json_dict["VARIABLE_SETTINGS"]];
-local_std_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing : eval(Meta.parse(_dict["SCALING_FUNCTION"])) for _dict in local_json_dict["VARIABLE_STD_SETTINGS"]];
-reprocess_data!(local_json_dict; file_name_function = local_name_function, data_scaling_functions = local_data_scaling_functions, std_scaling_functions = local_std_scaling_functions);
