@@ -103,23 +103,37 @@ function reprocess_data!(
     end;
 
     # work on the first data to test
-    _file = _files[1];
-    if length(_dict_vars) == 1
-        _reprocessed_data = read_data(_file, _dict_vars[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = data_scaling_functions[1]);
-        _reprocessed_std = read_data(_file, _dict_stds[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = std_scaling_functions[1]);
-    else
-        _reprocessed_data = ones(Float64, 360 * _dict_grid["SPATIAL_RESOLUTION"], 180 * _dict_grid["SPATIAL_RESOLUTION"], length(_dict_vars));
-        _reprocessed_std = ones(Float64, 360 * _dict_grid["SPATIAL_RESOLUTION"], 180 * _dict_grid["SPATIAL_RESOLUTION"], length(_dict_vars));
-        for _i_var in eachindex(_dict_vars)
-            _reprocessed_data[:,:,_i_var] = read_data(_file, _dict_vars[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = data_scaling_functions[_i_var]);
-            _reprocessed_std[:,:,_i_var] = read_data(_file, _dict_stds[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = std_scaling_functions[_i_var]);
+    _i_years = (_years == "" ? [1] : eachindex(_years));
+    for _i_year in _i_years
+        # determine whether to skip based on the tag
+        _tag = (_years == "" ? griddingmachine_tag(dict, 0) : griddingmachine_tag(dict, _years[_i_year]));
+        _reprocessed_file = "/home/wyujie/GriddingMachine/reprocessed/$(_tag).nc";
+
+        # reprocess the data only if file does not exist
+        if !isfile(_reprocessed_file)
+            # read the data
+            _file = _files[_i_year]
+            if length(_dict_vars) == 1
+                _reprocessed_data = read_data(_file, _dict_vars[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = data_scaling_functions[1]);
+                _reprocessed_std = read_data(_file, _dict_stds[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = std_scaling_functions[1]);
+            else
+                _reprocessed_data = ones(Float64, 360 * _dict_grid["SPATIAL_RESOLUTION"], 180 * _dict_grid["SPATIAL_RESOLUTION"], length(_dict_vars));
+                _reprocessed_std = ones(Float64, 360 * _dict_grid["SPATIAL_RESOLUTION"], 180 * _dict_grid["SPATIAL_RESOLUTION"], length(_dict_vars));
+                for _i_var in eachindex(_dict_vars)
+                    _reprocessed_data[:,:,_i_var] = read_data(_file, _dict_vars[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = data_scaling_functions[_i_var]);
+                    _reprocessed_std[:,:,_i_var] = read_data(_file, _dict_stds[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = std_scaling_functions[_i_var]);
+                end;
+            end;
+
+            # save the file
+            _var_attribute = Dict{String,String}(dict["NETCDF_ATTRIBUTES"]);
+            _dim_names = length(size(_reprocessed_std)) == 3 ? ["lon", "lat", "ind"] : ["lon", "lat"];
+            save_nc!(_reprocessed_file, "data", _reprocessed_data, _var_attribute);
+            append_nc!(_reprocessed_file, "std", _reprocessed_std, _var_attribute, _dim_names);
+        else
+            @info "File $(_reprocessed_file) exists already, skipping...";
         end;
     end;
-
-    # save the file
-    _tag = griddingmachine_tag(dict, _years[1]);
-    _reprocessed_file = "/home/wyujie/GriddingMachine/reprocessed/$(_tag).nc";
-    _var_attribute = Dict{String,String}(dict["NETCDF_ATTRIBUTES"]);
 
     # add change logs based on the JSON file
     #=
@@ -135,10 +149,6 @@ function reprocess_data!(
     =#
     # _count = 0;
     # push!()
-
-    _dim_names = length(size(_reprocessed_std)) == 3 ? ["lon", "lat", "ind"] : ["lon", "lat"];
-    save_nc!(_reprocessed_file, "data", _reprocessed_data, _var_attribute);
-    append_nc!(_reprocessed_file, "std", _reprocessed_std, _var_attribute, _dim_names);
 
     return nothing
 end
