@@ -3,12 +3,15 @@
 #
 using JSON
 
-function json!()
-    #
-    #
-    # GriddingMachine tag generator
-    #
-    #
+
+"""
+
+    griddingmachine_dict()
+
+Create a Dict that stores information about GriddingMachine tag
+
+"""
+function griddingmachine_dict()
     @info "These inputs are meant to generate the GriddingMachine TAG...";
 
     # ask for level 1 label
@@ -69,11 +72,26 @@ function json!()
         @info "The GriddingMachine tag will be $(_labeling)_$(_spatial_resolution_nx)X_$(_temporal_resolution)_YEAR_V$(_version)";
     end;
 
-    #
-    #
-    # Netcdf reference generator
-    #
-    #
+    # return the dict for GriddingMachine
+    return Dict{String,Any}(
+        "LABEL"               => _label,
+        "EXTRA LABEL"         => _label_extra,
+        "SPATIAL RESOLUTION"  => _spatial_resolution_nx,
+        "TEMPORAL RESOLUTION" => _temporal_resolution,
+        "YEARS"               => _years,
+        "VERSION"             => _version,
+    )
+end
+
+
+"""
+
+    attribute_dict()
+
+Create a Dict that stores information about variable attributes
+
+"""
+function variable_attribute_dict()
     @info "These inputs are meant to generate the reference information witin the Netcdf dataset...";
 
     # ask for the long name, unit, and about of the variable
@@ -94,11 +112,28 @@ function json!()
     print("    Please input the DOI of the publication > ");
     _doi = readline();
 
-    #
-    #
-    # Log of changes to make
-    #
-    #
+    # return the Dict for attributes
+    return Dict{String,Any}(
+        "LONG NAME" => _longname,
+        "UNIT"      => _unit,
+        "ABOUT"     => _about,
+        "AUTHORS"   => _authors,
+        "YEAR"      => _year_pub,
+        "TITLE"     => _title,
+        "JOURNAL"   => _journal,
+        "DOI"       => _doi,
+    )
+end
+
+
+"""
+
+    map_setup_dict()
+
+Create the Dict that stores information about the map settings
+
+"""
+function map_setup_dict()
     @info "These inputs are meant to determine what changes are required to pre-process the dataset...";
 
     # ask the format of input dataset
@@ -132,15 +167,31 @@ function json!()
     print("    Do you need to re-orient the map on the latitudinal direction? (Yes or No) > ");
     _reorient_lat = uppercase(readline());
     @assert _reorient_lat in ["N", "NO", "Y", "YES"];
+    _flip_lat = _reorient_lat in ["Y", "YES"];
     print("    Do you need to re-orient the map on the longitudinal direction? (Yes or No) > ");
     _reorient_lon = uppercase(readline());
     @assert _reorient_lon in ["N", "NO", "Y", "YES"];
+    _flip_lon = _reorient_lon in ["Y", "YES"];
 
-    #
-    #
-    # About the variables
-    #
-    #
+    # return the Dict for raw dataset settings
+    return Dict{String,Any}(
+        "FORMAT"           => _format,
+        "PROJECTION"       => _projection,
+        "VALUE AT"         => _represent,
+        "COVERAGE"         => _coverages,
+        "LAT LON FLIPPING" => [_flip_lat, _flip_lon],
+    )
+end
+
+
+"""
+
+    variable_dicts()
+
+Create a vector of Dicts that store variable information
+
+"""
+function variable_dicts()
     @info "These questions are about how to read the data, please be careful about them...";
 
     # ask for how many independent variables do you want to save as DATA
@@ -166,43 +217,39 @@ function json!()
             "DATA NAME"            => _data_name,
             "LONGITUDE AXIS INDEX" => _i_lon,
             "LATITUDE AXIS INDEX"  => _i_lat,
-            "INDX AXIS INDX"       => _i_idx,
+            "INDEX AXIS INDEX"     => _i_idx,
             "SCALING FUNCTION"     => _scaling_function,
             "MASKING FUNCTION"     => _masking_function,
         );
         push!(_data_dicts, _data_dict);
     end;
 
-    # display the dict to save
-    _json_dict = Dict{String,Any}(
-        "GriddingMachine" => Dict{String,Any}(
-                    "LABEL"               => _label,
-                    "EXTRA LABEL"         => _label_extra,
-                    "SPATIAL RESOLUTION"  => _spatial_resolution_nx,
-                    "TEMPORAL RESOLUTION" => _temporal_resolution,
-                    "YEARS"               => _years,
-                    "VERSION"             => _version,
-        ),
-        "Netcdf Attributes" => Dict{String,String}(
-                    "LONG NAME" => _longname,
-                    "UNIT"      => _unit,
-                    "ABOUT"     => _about,
-                    "AUTHORS"   => _authors,
-                    "YEAR"      => _year_pub,
-                    "TITLE"     => _title,
-                    "JOURNAL"   => _journal,
-                    "DOI"       => _doi,
-        ),
-        "Netcdf Dataset" => Dict{String,Any}(
-                    "FORMAT"        => _format,
-                    "PROJECTION"    => _projection,
-                    "VALUE AT"      => _represent,
-                    "COVERAGE"      => _coverages,
-                    "NEED FLIPPING" => [_reorient_lat, _reorient_lon],
-                    "DATA DETAILS"  => _data_dicts,
-        ),
-    );
-    @info "You inputs are" _json_dict;
+    return _data_dicts
+end
 
-    return _json_dict
+
+"""
+
+    griddingmachine_json!(filename::String = "test.json")
+
+Create a JSON file to generate GriddingMachine dataset, given
+- `filename` File name of the json file to save
+
+"""
+function griddingmachine_json!(filename::String = "test.json")
+    # create a dict to save as JSON file
+    _json_dict = Dict{String,Any}(
+        "GRIDDINGMACHINE"        => griddingmachine_dict(),
+        "INPUT DATASET SETTINGS" => map_setup_dict(),
+        "VARIABLE SETTINGS"      => variable_dicts(),
+        "NETCDF ATTRIBUTES"      => variable_attribute_dict(),
+    );
+
+    # save the JSON file
+    _filename = filename[end-4:end] == ".json" ? filename : "$(filename).json";
+    open(_filename, "w") do f
+        JSON.print(f, _json_dict, 4);
+    end;
+
+    return nothing
 end
