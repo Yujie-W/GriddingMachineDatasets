@@ -25,6 +25,32 @@
             "SCALING_FUNCTION": "x -> x / 100"
         }
     ],
+    "VARIABLE_STD_SETTINGS": [
+        {
+            "INDEX_AXIS_INDEX": 3,
+            "LATITUDE_AXIS_INDEX": 2,
+            "DATA_NAME": "forestcoverfraction_variance",
+            "MASKING_FUNCTION": "",
+            "LONGITUDE_AXIS_INDEX": 1,
+            "SCALING_FUNCTION": "x -> x / 100"
+        },
+        {
+            "INDEX_AXIS_INDEX": 3,
+            "LATITUDE_AXIS_INDEX": 2,
+            "DATA_NAME": "othervegetationfraction_variance",
+            "MASKING_FUNCTION": "",
+            "LONGITUDE_AXIS_INDEX": 1,
+            "SCALING_FUNCTION": "x -> x / 100"
+        },
+        {
+            "INDEX_AXIS_INDEX": 3,
+            "LATITUDE_AXIS_INDEX": 2,
+            "DATA_NAME": "novegetationfraction_variance",
+            "MASKING_FUNCTION": "",
+            "LONGITUDE_AXIS_INDEX": 1,
+            "SCALING_FUNCTION": "x -> x / 100"
+        }
+    ],
     "INPUT_DATASET_SETTINGS": {
         "FOLDER": "/net/squid/data1/data/pooled/MODIS/MOD44B/gridded",
         "FILE_NAME_PATTERN": "MODIS-TERRA_C6.1__MOD44B__ForestCoverFraction__LPDAAC__GLOBAL__0.5degree__UHAM-ICDC__XXXXXXXX__fv0.01.nc",

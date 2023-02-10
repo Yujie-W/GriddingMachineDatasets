@@ -1,6 +1,6 @@
 using JSON
 
-using JuliaUtilities.NetcdfIO: read_nc, save_nc!
+using JuliaUtilities.NetcdfIO: append_nc!, read_nc, save_nc!
 
 
 function read_data_2d(data::Array, ind::Int, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)
@@ -81,10 +81,15 @@ function griddingmachine_tag(dict::Dict, year::Int)
 end
 
 
-function reprocess_data!(dict::Dict; file_name_function::Union{Function,Nothing} = nothing, variable_scaling_functions::Vector = [nothing for _i in eachindex(dict["VARIABLE_SETTINGS"])])
+function reprocess_data!(
+            dict::Dict;
+            file_name_function::Union{Function,Nothing} = nothing,
+            data_scaling_functions::Vector = [nothing for _i in eachindex(dict["VARIABLE_SETTINGS"])],
+            std_scaling_functions::Vector = [nothing for _i in eachindex(dict["VARIABLE_SETTINGS"])])
     _dict_file = dict["INPUT_DATASET_SETTINGS"];
     _dict_grid = dict["GRIDDINGMACHINE"];
     _dict_vars = dict["VARIABLE_SETTINGS"];
+    _dict_stds = dict["VARIABLE_STD_SETTINGS"];
 
     # determine if there is any information for years
     _years = _dict_grid["YEARS"];
@@ -100,11 +105,14 @@ function reprocess_data!(dict::Dict; file_name_function::Union{Function,Nothing}
     # work on the first data to test
     _file = _files[1];
     if length(_dict_vars) == 1
-        _reprocessed_data = read_data(_file, _dict_vars[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = variable_scaling_functions[1]);
+        _reprocessed_data = read_data(_file, _dict_vars[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = data_scaling_functions[1]);
+        _reprocessed_std = read_data(_file, _dict_stds[1], _dict_file["LAT_LON_FLIPPING"]; scaling_function = std_scaling_functions[1]);
     else
         _reprocessed_data = ones(Float64, 360 * _dict_grid["SPATIAL_RESOLUTION"], 180 * _dict_grid["SPATIAL_RESOLUTION"], length(_dict_vars));
+        _reprocessed_std = ones(Float64, 360 * _dict_grid["SPATIAL_RESOLUTION"], 180 * _dict_grid["SPATIAL_RESOLUTION"], length(_dict_vars));
         for _i_var in eachindex(_dict_vars)
-            _reprocessed_data[:,:,_i_var] = read_data(_file, _dict_vars[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = variable_scaling_functions[_i_var]);
+            _reprocessed_data[:,:,_i_var] = read_data(_file, _dict_vars[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = data_scaling_functions[_i_var]);
+            _reprocessed_std[:,:,_i_var] = read_data(_file, _dict_stds[_i_var], _dict_file["LAT_LON_FLIPPING"]; scaling_function = std_scaling_functions[_i_var]);
         end;
     end;
 
@@ -128,7 +136,9 @@ function reprocess_data!(dict::Dict; file_name_function::Union{Function,Nothing}
     # _count = 0;
     # push!()
 
+    _dim_names = length(size(_reprocessed_std)) == 3 ? ["lon", "lat", "ind"] : ["lon", "lat"];
     save_nc!(_reprocessed_file, "data", _reprocessed_data, _var_attribute);
+    append_nc!(_reprocessed_file, "std", _reprocessed_std, _var_attribute, _dim_names);
 
     return nothing
 end
@@ -138,5 +148,6 @@ using Dates
 
 local_json_dict = JSON.parse(open("json/VCF_2X_1Y_V1.json"));
 local_name_function = eval(Meta.parse(local_json_dict["INPUT_DATASET_SETTINGS"]["FILE_NAME_FUNCTION"]));
-local_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing : eval(Meta.parse(_dict["SCALING_FUNCTION"])) for _dict in local_json_dict["VARIABLE_SETTINGS"]];
-local_data = reprocess_data!(local_json_dict; file_name_function = local_name_function, variable_scaling_functions = local_scaling_functions);
+local_data_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing : eval(Meta.parse(_dict["SCALING_FUNCTION"])) for _dict in local_json_dict["VARIABLE_SETTINGS"]];
+local_std_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing : eval(Meta.parse(_dict["SCALING_FUNCTION"])) for _dict in local_json_dict["VARIABLE_STD_SETTINGS"]];
+reprocess_data!(local_json_dict; file_name_function = local_name_function, data_scaling_functions = local_data_scaling_functions, std_scaling_functions = local_std_scaling_functions);
