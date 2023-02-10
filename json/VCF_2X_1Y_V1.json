@@ -6,7 +6,7 @@
             "DATA NAME": "forestcoverfraction",
             "MASKING FUNCTION": "",
             "LONGITUDE AXIS INDEX": 1,
-            "SCALING FUNCTION": ""
+            "SCALING FUNCTION": "x -> x / 100"
         },
         {
             "INDEX AXIS INDEX": 3,
@@ -14,7 +14,7 @@
             "DATA NAME": "othervegetationfraction",
             "MASKING FUNCTION": "",
             "LONGITUDE AXIS INDEX": 1,
-            "SCALING FUNCTION": ""
+            "SCALING FUNCTION": "x -> x / 100"
         },
         {
             "INDEX AXIS INDEX": 3,
@@ -22,7 +22,7 @@
             "DATA NAME": "novegetationfraction",
             "MASKING FUNCTION": "",
             "LONGITUDE AXIS INDEX": 1,
-            "SCALING FUNCTION": ""
+            "SCALING FUNCTION": "x -> x / 100"
         }
     ],
     "INPUT DATASET SETTINGS": {
