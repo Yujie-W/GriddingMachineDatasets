@@ -75,9 +75,9 @@ function griddingmachine_dict()
     # return the dict for GriddingMachine
     return Dict{String,Any}(
         "LABEL"               => _label,
-        "EXTRA LABEL"         => _label_extra,
-        "SPATIAL RESOLUTION"  => _spatial_resolution_nx,
-        "TEMPORAL RESOLUTION" => _temporal_resolution,
+        "EXTRA_LABEL"         => _label_extra,
+        "SPATIAL_RESOLUTION"  => _spatial_resolution_nx,
+        "TEMPORAL_RESOLUTION" => _temporal_resolution,
         "YEARS"               => _years,
         "VERSION"             => _version,
     )
@@ -104,7 +104,7 @@ function variable_attribute_dict()
     print("    Please input the author information (e.g., Name S. et al.) > ");
     _authors = readline();
     print("    Please input the year of the publication > ");
-    _year_pub = parse(Int,readline());
+    _year_pub = readline();
     print("    Please input the title of the publication > ");
     _title = readline();
     print("    Please input the journal of the publication > ");
@@ -113,15 +113,15 @@ function variable_attribute_dict()
     _doi = readline();
 
     # return the Dict for attributes
-    return Dict{String,Any}(
-        "LONG NAME" => _longname,
-        "UNIT"      => _unit,
-        "ABOUT"     => _about,
-        "AUTHORS"   => _authors,
-        "YEAR"      => _year_pub,
-        "TITLE"     => _title,
-        "JOURNAL"   => _journal,
-        "DOI"       => _doi,
+    return Dict{String,String}(
+        "long_name" => _longname,
+        "unit"      => _unit,
+        "about"     => _about,
+        "authors"   => _authors,
+        "year"      => _year_pub,
+        "title"     => _title,
+        "journal"   => _journal,
+        "doi"       => _doi,
     )
 end
 
@@ -177,9 +177,9 @@ function map_setup_dict()
     return Dict{String,Any}(
         "FORMAT"           => _format,
         "PROJECTION"       => _projection,
-        "VALUE AT"         => _represent,
+        "VALUE_AT"         => _represent,
         "COVERAGE"         => _coverages,
-        "LAT LON FLIPPING" => [_flip_lat, _flip_lon],
+        "LAT_LON_FLIPPING" => [_flip_lat, _flip_lon],
     )
 end
 
@@ -214,12 +214,12 @@ function variable_dicts()
         print("        What are your mask function for NaN, type it here, e.g., x -> (0.1 < x <= 0.2 && x * 6 > 1) > ");
         _masking_function = readline();
         _data_dict = Dict{String,Any}(
-            "DATA NAME"            => _data_name,
-            "LONGITUDE AXIS INDEX" => _i_lon,
-            "LATITUDE AXIS INDEX"  => _i_lat,
-            "INDEX AXIS INDEX"     => _i_idx,
-            "SCALING FUNCTION"     => _scaling_function,
-            "MASKING FUNCTION"     => _masking_function,
+            "DATA_NAME"            => _data_name,
+            "LONGITUDE_AXIS_INDEX" => _i_lon,
+            "LATITUDE_AXIS_INDEX"  => _i_lat,
+            "INDEX_AXIS_INDEX"     => _i_idx,
+            "SCALING_FUNCTION"     => _scaling_function,
+            "MASKING_FUNCTION"     => _masking_function,
         );
         push!(_data_dicts, _data_dict);
     end;
@@ -240,9 +240,9 @@ function griddingmachine_json!(filename::String = "test.json")
     # create a dict to save as JSON file
     _json_dict = Dict{String,Any}(
         "GRIDDINGMACHINE"        => griddingmachine_dict(),
-        "INPUT DATASET SETTINGS" => map_setup_dict(),
-        "VARIABLE SETTINGS"      => variable_dicts(),
-        "NETCDF ATTRIBUTES"      => variable_attribute_dict(),
+        "INPUT_DATASET_SETTINGS" => map_setup_dict(),
+        "VARIABLE_SETTINGS"      => variable_dicts(),
+        "NETCDF_ATTRIBUTES"      => variable_attribute_dict(),
     );
 
     # save the JSON file
