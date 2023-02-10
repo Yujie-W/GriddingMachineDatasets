@@ -6,48 +6,6 @@ using JSON
 
 """
 
-    attribute_dict()
-
-Create a Dict that stores information about variable attributes
-
-"""
-function variable_attribute_dict()
-    @info "These inputs are meant to generate the reference information witin the Netcdf dataset...";
-
-    # ask for the long name, unit, and about of the variable
-    print("    Please input the long name of the variable to save > ");
-    _longname = readline();
-    print("    Please input the unit of the variable to save > ");
-    _unit = readline();
-    print("    Please input some more details of the variable to save > ");
-    _about = readline();
-    print("    Please input the author information (e.g., Name S. et al.) > ");
-    _authors = readline();
-    print("    Please input the year of the publication > ");
-    _year_pub = readline();
-    print("    Please input the title of the publication > ");
-    _title = readline();
-    print("    Please input the journal of the publication > ");
-    _journal = readline();
-    print("    Please input the DOI of the publication > ");
-    _doi = readline();
-
-    # return the Dict for attributes
-    return Dict{String,String}(
-        "long_name" => _longname,
-        "unit"      => _unit,
-        "about"     => _about,
-        "authors"   => _authors,
-        "year"      => _year_pub,
-        "title"     => _title,
-        "journal"   => _journal,
-        "doi"       => _doi,
-    )
-end
-
-
-"""
-
     map_setup_dict()
 
 Create the Dict that stores information about the map settings

@@ -1,6 +1,7 @@
 """
 
     verified_input(message::String, operation_function::Function, judge_function::Function)
+    verified_input(message::String, judge_function::Function)
 
 Return a verified input, given
 - `msg` Message about the input variable
@@ -8,7 +9,9 @@ Return a verified input, given
 - `judge_function` Function to judge if the input meets the requirements
 
 """
-function verified_input(message::String, operation_function::Function, judge_function::Function)
+function verified_input end
+
+verified_input(message::String, operation_function::Function, judge_function::Function) = (
     _input = nothing;
 
     # loop until a correct input is given
@@ -27,4 +30,21 @@ function verified_input(message::String, operation_function::Function, judge_fun
     end;
 
     return _input
-end
+);
+
+verified_input(message::String, judge_function::Function) = (
+    _input = nothing;
+
+    # loop until a correct input is given
+    while true
+        print(message);
+        _input = readline();
+        if judge_function(_input)
+            break;
+        else
+            @warn "You input does not meet the requirements, please redo it!"
+        end;
+    end;
+
+    return _input
+);
