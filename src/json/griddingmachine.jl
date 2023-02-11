@@ -74,16 +74,46 @@ function griddingmachine_dict()
         _try_again = verified_input(_msg, _opr_4, _jdg_6);
         if !_try_again
             _griddingmachine_dict = Dict{String,Any}(
-                "LABEL"               => _label,
-                "EXTRA_LABEL"         => _label_extra,
-                "SPATIAL_RESOLUTION"  => _spatial_resolution_nx,
-                "TEMPORAL_RESOLUTION" => _temporal_resolution,
-                "YEARS"               => _years,
-                "VERSION"             => _version,
+                "LABEL"         => _label,
+                "EXTRA_LABEL"   => _label_extra,
+                "LAT_LON_RESO"  => _spatial_resolution_nx,
+                "TEMPORAL_RESO" => _temporal_resolution,
+                "YEARS"         => _years,
+                "VERSION"       => _version,
             );
             break;
         end;
     end;
 
     return _griddingmachine_dict
+end
+
+
+"""
+
+    griddingmachine_tag(dict::Dict, year::Int = 0)
+
+Generate the GriddingMachine TAG, given
+- `dict` Dict readed from JSON file
+- `year` Which year (used only when YEARS in dict is not nothing)
+
+"""
+function griddingmachine_tag(dict::Dict, year::Int = 0)
+    _griddingmachine_dict = dict["GRIDDINGMACHINE"];
+
+    _years = _griddingmachine_dict["YEARS"];
+    _label = _griddingmachine_dict["LABEL"];
+    _label_extra = _griddingmachine_dict["EXTRA_LABEL"];
+    _labeling = isnothing(_label_extra) ? _label : _label * "_" * _label_extra;
+    _spatial_resolution_nx = _griddingmachine_dict["LAT_LON_RESO"];
+    _temporal_resolution = _griddingmachine_dict["TEMPORAL_RESO"];
+    _version = _griddingmachine_dict["VERSION"];
+
+    if isnothing(_years)
+        _tag = "$(_labeling)_$(_spatial_resolution_nx)X_$(_temporal_resolution)_V$(_version)";
+    else
+        _tag = "$(_labeling)_$(_spatial_resolution_nx)X_$(_temporal_resolution)_$(year)_V$(_version)";
+    end;
+
+    return _tag
 end

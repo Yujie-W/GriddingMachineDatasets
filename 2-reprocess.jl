@@ -3,6 +3,11 @@ using JSON
 using JuliaUtilities.NetcdfIO: append_nc!, read_nc, save_nc!
 
 
+include("src/json/attribute.jl"      )
+include("src/json/griddingmachine.jl")
+include("src/json/input.jl"          )
+
+
 function read_data_2d(data::Array, ind::Int, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)
     # read the layer based on the index orders
     if isnothing(dict["INDEX_AXIS_INDEX"])
@@ -61,26 +66,6 @@ function read_data(filename::String, dict::Dict, flipping::Vector; scaling_funct
 end
 
 
-function griddingmachine_tag(dict::Dict, year::Int)
-    _dict_grid = dict["GRIDDINGMACHINE"];
-    _years = _dict_grid["YEARS"];
-    _label = _dict_grid["LABEL"];
-    _label_extra = _dict_grid["EXTRA_LABEL"];
-    _labeling = isnothing(_label_extra) ? _label : _label * "_" * _label_extra;
-    _spatial_resolution_nx = _dict_grid["SPATIAL_RESOLUTION"];
-    _temporal_resolution = _dict_grid["TEMPORAL_RESOLUTION"];
-    _version = _dict_grid["VERSION"];
-
-    if _years == ""
-        _tag = "$(_labeling)_$(_spatial_resolution_nx)X_$(_temporal_resolution)_V$(_version)";
-    else
-        _tag = "$(_labeling)_$(_spatial_resolution_nx)X_$(_temporal_resolution)_$(year)_V$(_version)";
-    end;
-
-    return _tag
-end
-
-
 function reprocess_data!(
             dict::Dict;
             file_name_function::Union{Function,Nothing} = nothing,
@@ -106,7 +91,7 @@ function reprocess_data!(
     _i_years = (_years == "" ? [1] : eachindex(_years));
     for _i_year in _i_years
         # determine whether to skip based on the tag
-        _tag = (_years == "" ? griddingmachine_tag(dict, 0) : griddingmachine_tag(dict, _years[_i_year]));
+        _tag = (_years == "" ? griddingmachine_tag(dict) : griddingmachine_tag(dict, _years[_i_year]));
         _reprocessed_file = "/home/wyujie/GriddingMachine/reprocessed/$(_tag).nc";
 
         # reprocess the data only if file does not exist
