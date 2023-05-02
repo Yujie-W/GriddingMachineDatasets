@@ -1,61 +1,110 @@
 function map_info_dict()
     @info "These inputs are meant to determine what changes are required to pre-process the dataset...";
-end
 
+    # functions to use within while loop
+    _jdg_1(x) = (x in ["GEOTIFF", "NETCDF"]);
+    _jdg_2(x) = (x in ["CYLINDRICAL", "SINUSOIDAL"]);
+    _jdg_3(x) = (x in [false, true]);
+    _jdg_4(x) = (
+        if x == "GLOBAL"
+            return true
+        elseif (x isa Vector) && length(x) == 4
+            if !(-90 <= x[1] < x[2] <= 90)
+                return false
+            elseif !((-180 <= x[3] < x[4] <= 180) || (0 <= x[3] < x[4] <= 360))
+                return false
+            else
+                return true
+            end;
+        else
+            return false
+        end;
+    );
+    _opr_1(x) = (
+        if uppercase(x) in ["G", "GEOTIFF", "TIFF"]
+            return "GEOTIFF"
+        elseif uppercase(x) in ["N", "NETCDF"]
+            return "NETCDF"
+        else
+            return uppercase(x)
+        end;
+    );
+    _opr_2(x) = (
+        if uppercase(x) in ["C", "CYLINDRICAL"]
+            return "CYLINDRICAL"
+        elseif uppercase(x) in ["S", "SINUSOIDAL"]
+            return "SINUSOIDAL"
+        else
+            return uppercase(x)
+        end;
+    );
+    _opr_3(x) = (
+        if uppercase(x) in ["C", "CENTER", "Y", "YES"]
+            return true
+        elseif uppercase(x) in ["E", "EDGE", "N", "NO"]
+            return false
+        else
+            return uppercase(x)
+        end;
+    );
+    _opr_4(x) = (
+        if uppercase(x) in ["G", "GLOBAL"]
+            return "GLOBAL"
+        elseif occursin(",", x)
+            return [parse(Float64, _str) for _str in split(x, ",")];
+        else
+            return uppercase(x)
+        end;
+    );
+    _opr_5(x) = (
+        if uppercase(x) in ["Y", "YES"]
+            return true
+        elseif uppercase(x) in ["N", "NO"]
+            return false
+        else
+            return uppercase(x)
+        end;
+    );
+    _opr_6(x) = (uppercase(x) in ["N", "NO"]);
 
-"""
+    # loop the inputs until satisfied
+    _map_info_dict = Dict{String,Any}();
+    while true
+        _msg = "    What is the format of the input dataset? (NetCDF or GeoTIFF) > ";
+        _format = verified_input(_msg, _opr_1, _jdg_1);
 
-    map_setup_dict()
+        _msg = "    What is the projection of the dataset? (Cylindrical or Sinusoidal) > ";
+        _projection = verified_input(_msg, _opr_2, _jdg_2);
 
-Create the Dict that stores information about the map settings
+        _msg = "    Does the value represent data in the center of a grid? (Y for Center or N for Edge) > ";
+        _represent = verified_input(_msg, _opr_3, _jdg_3);
 
-"""
-function map_setup_dict()
-    @info "These inputs are meant to determine what changes are required to pre-process the dataset...";
+        _msg = "    What is the coverage of the dataset? (Global or not; if not global, type in the conner values in the order or min lat, max lat, min lon, max lon) > ";
+        _coverages = verified_input(_msg, _opr_4, _jdg_4);
 
-    # ask the format of input dataset
-    print("    What is the format of the input dataset? (NetCDF or GeoTIFF) > ");
-    _format = uppercase(readline());
-    @assert _format in ["G", "GEOTIFF", "N", "NETCDF", "TIFF"] "The dataset must be NetCDF or GeoTIFF!";
+        _msg = "    Do you need to flip the latitudinal direction? (Yes or No) > ";
+        _flip_lat = verified_input(_msg, _opr_5, _jdg_3);
 
-    # ask the projection of the map
-    print("    What is the projection of the dataset? (Cylindrical or Sinusoidal) > ");
-    _projection = uppercase(readline());
-    @assert _projection in ["C", "CYLINDRICAL", "S", "SINUSOIDAL"] "The dataset projection must be within Cylindrical and Sinusoidal!";
+        _msg = "    Do you need to flip the longitudinal direction? (Yes or No) > ";
+        _flip_lon = verified_input(_msg, _opr_5, _jdg_3);
 
-    # ask for value of representation
-    print("    What does the value represent? (Center or Edge) > ");
-    _represent = uppercase(readline());
-    @assert _represent in ["C", "CENTER", "E", "EDGE"] "You must choose one from Center or Edge!";
+        _map_info_dict = Dict{String,Any}(
+            "FORMAT"     => _format,
+            "PROJECTION" => _projection,
+            "VALUE_AT"   => _represent,
+            "COVERAGE"   => _coverages,
+            "FLIP_LAT"   => _flip_lat,
+            "FLIP_LON"   => _flip_lon,
+        )
+        @show _map_info_dict
 
-    # ask and parse map coverage
-    print("    What is the coverage of the dataset? (Global or not; if not global, type in the conner values in the order or min lat, max lat, min lon, max lon) > ");
-    _coverage = uppercase(readline());
-    if occursin(",", _coverage)
-        _conners = [parse(Float64, _str) for _str in split(_coverage, ",")];
-        @assert -90 <= _conners[1] < _conners[2] <= 90 "Latitude must be within -90 to 90";
-        @assert ((-180 <= _conners[3] < _conners[4] <= 180) || 0 <= _conners[3] < _conners[4] <= 360) "Longitude must be within -180 to 180 or 0 to 360";
-    else
-        @assert _coverage in ["G", "GLOBAL"] "You need to guarantee the coverage input is correct";
+        # ask if the Dict looks okay, if so break
+        _msg = "Is the generated dict okay? If not, type <N/n or No> to redo the inputs > ";
+        _try_again = verified_input(_msg, _opr_6);
+        if !_try_again
+            break;
+        end;
     end;
-    _coverages = (_coverage in ["G", "GLOBAL"] ? "Global" : [parse(Float64, _str) for _str in split(_coverage, ",")]);
 
-    # ask for re-oritentation of the map
-    print("    Do you need to re-orient the map on the latitudinal direction? (Yes or No) > ");
-    _reorient_lat = uppercase(readline());
-    @assert _reorient_lat in ["N", "NO", "Y", "YES"];
-    _flip_lat = _reorient_lat in ["Y", "YES"];
-    print("    Do you need to re-orient the map on the longitudinal direction? (Yes or No) > ");
-    _reorient_lon = uppercase(readline());
-    @assert _reorient_lon in ["N", "NO", "Y", "YES"];
-    _flip_lon = _reorient_lon in ["Y", "YES"];
-
-    # return the Dict for raw dataset settings
-    return Dict{String,Any}(
-        "FORMAT"           => _format,
-        "PROJECTION"       => _projection,
-        "VALUE_AT"         => _represent,
-        "COVERAGE"         => _coverages,
-        "LAT_LON_FLIPPING" => [_flip_lat, _flip_lon],
-    )
+    return _map_info_dict
 end

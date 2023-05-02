@@ -66,7 +66,7 @@ function griddingmachine_json!(filename::String = "test.json")
     # create a dict to save as JSON file
     _json_dict = Dict{String,Any}(
         "GRIDDINGMACHINE" => griddingmachine_dict(),
-        "INPUT_MAP_SETS"  => map_setup_dict(),
+        "INPUT_MAP_SETS"  => map_info_dict(),
         "INPUT_VAR_SETS"  => variable_dicts(),
         "OUTPUT_REF_ATTR" => reference_attribute_dict(),
         "OUTPUT_VAR_ATTR" => variable_attribute_dict(),

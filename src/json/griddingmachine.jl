@@ -14,7 +14,6 @@ function griddingmachine_dict()
     _jdg_3(x) = (x > 0);
     _jdg_4(x) = (x != "" && !occursin(" ", x) && x[end:end] in ["H", "D", "M", "Y"]);
     _jdg_5(x) = (isnothing(x) || x isa Vector);
-    _jdg_6(x) = true;
     _opr_1(x) = (x == "" ? nothing : uppercase(x));
     _opr_2(x) = parse(Int, x);
     _opr_3(x) = (
@@ -71,7 +70,7 @@ function griddingmachine_dict()
 
         # ask if the TAG looks okay, if so break
         _msg = "Is the generated tag okay? If not, type <N/n or No> to redo the inputs > ";
-        _try_again = verified_input(_msg, _opr_4, _jdg_6);
+        _try_again = verified_input(_msg, _opr_4);
         if !_try_again
             _griddingmachine_dict = Dict{String,Any}(
                 "LABEL"         => _label,
