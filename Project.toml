@@ -1,9 +1,15 @@
+name = "GriddingMachineDatasets"
+uuid = "eb48b7a5-6706-4f14-bfad-33e5e84bb40d"
+authors = ["Yujie Wang"]
+version = "0.1.0"
+
 [deps]
 ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 GriddingMachine = "f20cf718-bf4d-4727-bc8f-485b1f283ac6"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 JuliaUtilities = "3f66fbc9-a591-47a2-a4a5-92df91d6e572"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
 ArchGDAL = "0.9.2"

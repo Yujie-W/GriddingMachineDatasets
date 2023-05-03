@@ -18,6 +18,16 @@
         "long_name": "Solar induced chlorophyll fluorescence at 740 nm",
         "unit": "mW m⁻² nm⁻¹ sr⁻¹"
     },
+    "INPUT_STD_SETS": [
+        {
+            "INDEX_AXIS_INDEX": 1,
+            "LATITUDE_AXIS_INDEX": 3,
+            "MASKING_FUNCTION": "",
+            "LONGITUDE_AXIS_INDEX": 2,
+            "SCALING_FUNCTION": "",
+            "DATA_NAME": "sif"
+        }
+    ],
     "INPUT_VAR_SETS": [
         {
             "INDEX_AXIS_INDEX": 1,

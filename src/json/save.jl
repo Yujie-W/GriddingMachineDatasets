@@ -1,15 +1,3 @@
-#
-# This file is meant to config the JSON file to aid further steps
-#
-using JSON
-
-
-include("src/json/attribute.jl");
-include("src/json/data.jl");
-include("src/json/griddingmachine.jl");
-include("src/json/map.jl");
-
-
 """
 
     griddingmachine_json!(filename::String = "test.json")
