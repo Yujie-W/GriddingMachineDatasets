@@ -6,10 +6,10 @@ function reprocess_data!(
             std_scaling_functions::Vector = [nothing for _i in eachindex(dict["VARIABLE_SETTINGS"])])
     _dict_file = dict["INPUT_MAP_SETS"];
     _dict_grid = dict["GRIDDINGMACHINE"];
-    _dict_stds = dict["INPUT_STD_SETS"];
     _dict_vars = dict["INPUT_VAR_SETS"];
     _dict_outv = dict["OUTPUT_VAR_ATTR"];
     _dict_refs = dict["OUTPUT_REF_ATTR"];
+    _dict_stds = "INPUT_STD_SETS" in keys(dict) ? dict["INPUT_STD_SETS"] : nothing;
 
     #"OUTPUT_REF_ATTR" => reference_attribute_dict(),
     #"OUTPUT_VAR_ATTR" => variable_attribute_dict(),
@@ -38,13 +38,15 @@ function reprocess_data!(
             _file = _files[_i_year]
             if length(_dict_vars) == 1
                 _reprocessed_data = read_data(_file, _dict_vars[1], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = data_scaling_functions[1]);
-                _reprocessed_std = read_data(_file, _dict_stds[1], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = std_scaling_functions[1]);
+                _reprocessed_std = !isnothing(_dict_stds) ? read_data(_file, _dict_stds[1], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = std_scaling_functions[1]) : ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"]) .* NaN;
             else
                 _reprocessed_data = ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"], length(_dict_vars));
-                _reprocessed_std = ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"], length(_dict_vars));
+                _reprocessed_std = ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"], length(_dict_vars)) .* NaN;
                 for _i_var in eachindex(_dict_vars)
                     _reprocessed_data[:,:,_i_var] = read_data(_file, _dict_vars[_i_var], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = data_scaling_functions[_i_var]);
-                    _reprocessed_std[:,:,_i_var] = read_data(_file, _dict_stds[_i_var], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = std_scaling_functions[_i_var]);
+                    if !isnothing(_dict_stds)
+                        _reprocessed_std[:,:,_i_var] = read_data(_file, _dict_stds[_i_var], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = std_scaling_functions[_i_var]);
+                    end;
                 end;
             end;
 
