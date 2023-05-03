@@ -20,6 +20,7 @@ function map_info_dict()
             return false
         end;
     );
+    _jdg_5(x) = (x in ["N", "NO", "Y", "YES"]);
     _opr_1(x) = (
         if uppercase(x) in ["G", "GEOTIFF", "TIFF"]
             return "GEOTIFF"
@@ -65,7 +66,6 @@ function map_info_dict()
             return uppercase(x)
         end;
     );
-    _opr_6(x) = (uppercase(x) in ["N", "NO"]);
 
     # loop the inputs until satisfied
     _map_info_dict = Dict{String,Any}();
@@ -100,7 +100,7 @@ function map_info_dict()
 
         # ask if the Dict looks okay, if so break
         _msg = "Is the generated dict okay? If not, type <N/n or No> to redo the inputs > ";
-        _try_again = verified_input(_msg, _opr_6);
+        _try_again = (verified_input(_msg, uppercase, _jdg_5) in ["N", "NO"]);
         if !_try_again
             break;
         end;

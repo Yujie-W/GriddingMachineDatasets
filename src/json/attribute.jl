@@ -18,7 +18,7 @@ function reference_attribute_dict()
             return false
         end;
     );
-    _opr_1(x) = (uppercase(x) in ["N", "NO"]);
+    _jdg_3(x) = (x in ["N", "NO", "Y", "YES"]);
 
     # loop the inputs until satisfied
     _attribute_dict = Dict{String,Any}();
@@ -49,7 +49,7 @@ function reference_attribute_dict()
 
         # ask if the Dict looks okay, if so break
         _msg = "Is the generated dict okay? If not, type <N/n or No> to redo the inputs > ";
-        _try_again = verified_input(_msg, _opr_1);
+        _try_again = (verified_input(_msg, uppercase, _jdg_3) in ["N", "NO"]);
         if !_try_again
             break;
         end;
@@ -71,7 +71,7 @@ function variable_attribute_dict()
 
     # functions to use in while loop
     _jdg_1(x) = (x != "");
-    _opr_1(x) = (uppercase(x) in ["N", "NO"]);
+    _jdg_2(x) = (x in ["N", "NO", "Y", "YES"]);
 
     # loop the inputs until satisfied
     _attribute_dict = Dict{String,Any}();
@@ -94,7 +94,7 @@ function variable_attribute_dict()
 
         # ask if the Dict looks okay, if so break
         _msg = "Is the generated dict okay? If not, type <N/n or No> to redo the inputs > ";
-        _try_again = verified_input(_msg, _opr_1);
+        _try_again = (verified_input(_msg, uppercase, _jdg_2) in ["N", "NO"]);
         if !_try_again
             break;
         end;
