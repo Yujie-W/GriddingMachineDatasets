@@ -1,14 +1,3 @@
-using JuliaUtilities.PkgUtility: deploy_artifact!
-
-
-GRIDDING_MACHINE_HOME = "/home/wyujie/GriddingMachine";
-ARTIFACT_TOML         = "$(GRIDDING_MACHINE_HOME)/Artifacts.toml";
-DATASET_FOLDER        = "$(GRIDDING_MACHINE_HOME)/reprocessed";
-ARTIFACT_FOLDER       = "$(GRIDDING_MACHINE_HOME)/artifacts"
-FTP_URLS              = ["ftp://fluo.gps.caltech.edu/XYZT_GRIDDING_MACHINE/artifacts"];
-
-
-include("2-reprocess.jl");
 
 
 function deploy_griddingmachine_artifacts!(dict::Dict)

@@ -1,6 +1,6 @@
 using JSON
 
-using GriddingMachineDatasets: griddingmachine_json!, reprocess_data!
+using GriddingMachineDatasets: deploy_griddingmachine_artifacts!, griddingmachine_json!, reprocess_data!
 
 tropomi_json = "$(@__DIR__)/json/TROPOMI_740_1X_1M_V1.json";
 
@@ -14,3 +14,5 @@ data_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing :  eval(Meta
 std_scaling_functions = [_dict["SCALING_FUNCTION"] == "" ? nothing : eval(Meta.parse(_dict["SCALING_FUNCTION"])) for _dict in json_dict["INPUT_STD_SETS"]];
 
 reprocess_data!(json_dict; file_name_function = name_function, data_scaling_functions = data_scaling_functions, std_scaling_functions = std_scaling_functions);
+
+deploy_griddingmachine_artifacts!(json_dict);
