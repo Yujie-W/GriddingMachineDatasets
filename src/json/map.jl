@@ -1,3 +1,10 @@
+"""
+
+    map_info_dict()
+
+Return a dict that contains map set up information to generate a JSON file
+
+"""
 function map_info_dict()
     @info "These inputs are meant to determine what changes are required to pre-process the dataset...";
 

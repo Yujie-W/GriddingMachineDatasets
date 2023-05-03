@@ -1,5 +1,11 @@
+"""
 
+    deploy_griddingmachine_artifacts!(dict::Dict)
 
+Deploy GriddingMachine artifacts, given
+- `dict` A dictionary based on JSON file
+
+"""
 function deploy_griddingmachine_artifacts!(dict::Dict)
     _dict_grid = dict["GRIDDINGMACHINE"];
 

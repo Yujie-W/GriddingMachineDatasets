@@ -1,4 +1,18 @@
+"""
 
+    reprocess_data!(
+                dict::Dict;
+                file_name_function::Union{Function,Nothing} = nothing,
+                data_scaling_functions::Vector = [nothing for _i in eachindex(dict["VARIABLE_SETTINGS"])],
+                std_scaling_functions::Vector = [nothing for _i in eachindex(dict["VARIABLE_SETTINGS"])])
+
+Reprocess the data to use in GriddingMachine artifacts, given
+- `dict` JSON dict
+- `file_name_function` Function to find file
+- `data_scaling_functions` Functions to scale data
+- `std_scaling_functions` Functions to scale std
+
+"""
 function reprocess_data!(
             dict::Dict;
             file_name_function::Union{Function,Nothing} = nothing,
@@ -10,9 +24,6 @@ function reprocess_data!(
     _dict_outv = dict["OUTPUT_VAR_ATTR"];
     _dict_refs = dict["OUTPUT_REF_ATTR"];
     _dict_stds = "INPUT_STD_SETS" in keys(dict) ? dict["INPUT_STD_SETS"] : nothing;
-
-    #"OUTPUT_REF_ATTR" => reference_attribute_dict(),
-    #"OUTPUT_VAR_ATTR" => variable_attribute_dict(),
 
     # determine if there is any information for years
     _years = _dict_grid["YEARS"];
@@ -34,11 +45,16 @@ function reprocess_data!(
 
         # reprocess the data only if file does not exist
         if !isfile(_reprocessed_file)
+            @info "File $(_reprocessed_file) does not exist, reprocessing...";
             # read the data
             _file = _files[_i_year]
             if length(_dict_vars) == 1
                 _reprocessed_data = read_data(_file, _dict_vars[1], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = data_scaling_functions[1]);
-                _reprocessed_std = !isnothing(_dict_stds) ? read_data(_file, _dict_stds[1], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = std_scaling_functions[1]) : ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"]) .* NaN;
+                _reprocessed_std = if !isnothing(_dict_stds)
+                    read_data(_file, _dict_stds[1], [_dict_file["FLIP_LAT"],_dict_file["FLIP_LON"]]; scaling_function = std_scaling_functions[1])
+                else
+                    similar(_reprocessed_data) .* NaN
+                end;
             else
                 _reprocessed_data = ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"], length(_dict_vars));
                 _reprocessed_std = ones(Float64, 360 * _dict_grid["LAT_LON_RESO"], 180 * _dict_grid["LAT_LON_RESO"], length(_dict_vars)) .* NaN;

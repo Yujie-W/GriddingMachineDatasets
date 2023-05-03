@@ -1,4 +1,15 @@
+"""
 
+    read_data_2d(data::Array, ind::Int, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)
+
+Return formatted 2D data, given
+- `data` Input 3D data
+- `ind` Index for 3rd dimension
+- `dict` Dict about the data format
+- `flipping` Whether to flip latitude and longitude
+- `scaling_function` Scaling function that to apply
+
+"""
 function read_data_2d(data::Array, ind::Int, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)
     # read the layer based on the index orders
     if isnothing(dict["INDEX_AXIS_INDEX"])
@@ -40,6 +51,17 @@ function read_data_2d(data::Array, ind::Int, dict::Dict, flipping::Vector; scali
 end
 
 
+"""
+
+    read_data(filename::String, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)
+
+Return the formatted data, given
+- `filename` File to read
+- `dict` Dict about the data format
+- `flipping` Whether to flip latitude and longitude
+- `scaling_function` Scaling function that to apply
+
+"""
 function read_data(filename::String, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)
     _data = read_nc(filename, dict["DATA_NAME"]);
 
