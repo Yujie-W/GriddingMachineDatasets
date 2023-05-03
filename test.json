@@ -1,0 +1,42 @@
+{
+    "GRIDDINGMACHINE": {
+        "LABEL": "G",
+        "VERSION": 1,
+        "EXTRA_LABEL": null,
+        "LAT_LON_RESO": 1,
+        "YEARS": [
+            2004
+        ],
+        "TEMPORAL_RESO": "1M"
+    },
+    "OUTPUT_VAR_ATTR": {
+        "about": "k",
+        "long_name": "h",
+        "unit": "k"
+    },
+    "INPUT_VAR_SETS": [
+        {
+            "INDEX_AXIS_INDEX": "0",
+            "LATITUDE_AXIS_INDEX": "2",
+            "MASKING_FUNCTION": "m",
+            "LONGITUDE_AXIS_INDEX": "1",
+            "SCALING_FUNCTION": "",
+            "DATA_NAME": "f"
+        }
+    ],
+    "OUTPUT_REF_ATTR": {
+        "year": "2019",
+        "journal": "k",
+        "doi": "k",
+        "title": "k",
+        "authors": "y"
+    },
+    "INPUT_MAP_SETS": {
+        "FORMAT": "NETCDF",
+        "PROJECTION": "CYLINDRICAL",
+        "VALUE_AT": true,
+        "FLIP_LAT": false,
+        "COVERAGE": "GLOBAL",
+        "FLIP_LON": false
+    }
+}

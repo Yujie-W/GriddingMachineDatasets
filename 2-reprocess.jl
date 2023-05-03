@@ -3,9 +3,8 @@ using JSON
 using JuliaUtilities.NetcdfIO: append_nc!, read_nc, save_nc!
 
 
-include("src/json/attribute.jl"      )
-include("src/json/griddingmachine.jl")
-include("src/json/input.jl"          )
+include("src/json/attribute.jl");
+include("src/json/griddingmachine.jl");
 
 
 function read_data_2d(data::Array, ind::Int, dict::Dict, flipping::Vector; scaling_function::Union{Function,Nothing} = nothing)

@@ -36,6 +36,9 @@
         "authors": "Köhler P. et al."
     },
     "INPUT_MAP_SETS": {
+        "FOLDER": "/home/wyujie/GriddingMachine/original",
+        "FILE_NAME_PATTERN": "SIF_TROPOMI_740_1X_1M_XXXXXXXX_V1.nc",
+        "FILE_NAME_FUNCTION": "x -> lpad(x,4,\"0\")",
         "FORMAT": "NETCDF",
         "PROJECTION": "CYLINDRICAL",
         "VALUE_AT": true,

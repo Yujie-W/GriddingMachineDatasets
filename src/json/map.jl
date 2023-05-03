@@ -89,12 +89,15 @@ function map_info_dict()
         _flip_lon = verified_input(_msg, _opr_5, _jdg_3);
 
         _map_info_dict = Dict{String,Any}(
-            "FORMAT"     => _format,
-            "PROJECTION" => _projection,
-            "VALUE_AT"   => _represent,
-            "COVERAGE"   => _coverages,
-            "FLIP_LAT"   => _flip_lat,
-            "FLIP_LON"   => _flip_lon,
+            "FOLDER"             => "",
+            "FILE_NAME_PATTERN"  => "",
+            "FILE_NAME_FUNCTION" => "",
+            "FORMAT"             => _format,
+            "PROJECTION"         => _projection,
+            "VALUE_AT"           => _represent,
+            "COVERAGE"           => _coverages,
+            "FLIP_LAT"           => _flip_lat,
+            "FLIP_LON"           => _flip_lon,
         )
         @show _map_info_dict
 
