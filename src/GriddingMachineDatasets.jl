@@ -8,7 +8,7 @@ using JuliaUtilities.PkgUtility: deploy_artifact!, pretty_display!
 
 
 GRIDDING_MACHINE_HOME = "/home/wyujie/GriddingMachine";
-ARTIFACT_TOML         = "$(GRIDDING_MACHINE_HOME)/Artifacts.toml";
+ARTIFACT_TOML         = "$(@__DIR__)/../Artifacts.toml";
 DATASET_FOLDER        = "$(GRIDDING_MACHINE_HOME)/reprocessed";
 ARTIFACT_FOLDER       = "$(GRIDDING_MACHINE_HOME)/artifacts"
 FTP_URLS              = ["ftp://fluo.gps.caltech.edu/XYZT_GRIDDING_MACHINE/artifacts"];

@@ -3,7 +3,7 @@
         "LABEL": "SIF",
         "VERSION": 1,
         "EXTRA_LABEL": "TROPOMI_740",
-        "LAT_LON_RESO": 1,
+        "LAT_LON_RESO": 5,
         "YEARS": [
             2018,
             2019,
@@ -47,7 +47,7 @@
     },
     "INPUT_MAP_SETS": {
         "FOLDER": "/home/wyujie/GriddingMachine/original",
-        "FILE_NAME_PATTERN": "SIF_TROPOMI_740_1X_1M_XXXXXXXX_V1.nc",
+        "FILE_NAME_PATTERN": "SIF_TROPOMI_740_5X_1M_XXXXXXXX_V1.nc",
         "FILE_NAME_FUNCTION": "x -> lpad(x,4,\"0\")",
         "FORMAT": "NETCDF",
         "PROJECTION": "CYLINDRICAL",
